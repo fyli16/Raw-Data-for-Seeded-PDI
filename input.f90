@@ -1,0 +1,123 @@
+&input
+
+! ------------------ global simulation info -----------!
+tmax = 2000.0, ! max sim. time, in units of 1/wci
+dtwci = 0.01,  ! value of dt*wci
+restart = .false.,  ! whether to restart from 'restart' directory
+
+! MPI nodes(ranks) configuration along y, z (no decompostion along x)
+! and whether the ranks are treated periodic in either directions
+node_conf(:) = 1, 56,
+periods(:) = .true., .true.,
+
+! simulation domain
+nx = 1, ny = 1, nz = 200,  ! total number of cells along each dim
+xmax = 0.1, ymax = 0.1, zmax = 100.,  ! max lengths of each dim
+
+! uniform loading in logical space
+! used in loading particles? see 'init waves'
+uniform_load_logical = .false., 
+
+! ------------------ field solver ----------------!
+n_sub_b = 5, ! number of subcycles for advancing B field
+eta_par = 0, ! ? options: 0, 1, 2; used in 'ecal'
+
+! field masking
+mask = .true., ! if to perform field masking
+mask_zs = 60, ! scale length (in cell) of field masking in z
+mask_r = 0.1, ! factor r in field masking, which controls the slope of mask function
+mask_B0_fac = 1.0, ! reduction factor for B0 in the mask layers (purpose: slow down wave & better absorption) 
+
+! load waves initially inside the box
+dB_B0         = 0.0, ! Alfven wave amplitude
+wave_cycles   = 10.0, ! number of wave cycles that would fill the box in z
+! upramp, flat, and downramp of the wave envelope
+! these only function when mask==.true.
+wave_upramp   = 200,  ! wave upramp length (in cell)
+wave_flat     = 200,  ! wave central flat length (in cell)
+wave_downramp = 200, ! wave downramp length (in cell)
+sign_cos      = 1.0, ! sign of cos\theta which determines wave propagation direction; +1: along B0; -1: opposite to B0
+
+! ------------------ inject waves  ----------------!
+inj_waves_b = .false., ! inject waves via B field
+inj_waves_bv = .false.,  ! inject waves via BV field
+inj_waves_e = .true.,  ! inject waves via E field
+inj_waves_b_rmf = .false.,  ! inject 3d RMF antenna waves via B field (read in from files)
+
+! inject max. 4 waves, each having its own amplitude, frequency, polarization, source size, etc.
+inj_dB_B0(1:4)       = 15.2e-3, 3.8e-3,    0.0,    0.0,   ! wave amplitude
+inj_wave_cycles(1:4) = 10.0,    9.2,   10.0,   10.0,  ! number of wave cycles used to determine frequency
+inj_wave_pol(1:4)    = 2,       2,      0,      1,     ! polarization; 0:l-x, 1:l-y, 2:c-left, 3:c-right 
+inj_wave_radius(1:4) = 10,      10,     0,      0,     ! raidus of wave injection (in cell)
+
+! injection properties
+inj_z_pos(1:4)       = 70,      130,     0,      0,     ! injection z position (in cell)
+inj_t_upramp(1:4)    = 50.0,    50.0,   200.0,  200.0, ! injection upramp time (in 1/wci)
+inj_t_flat(1:4)      = 1e8,     1e8,    200.0,  200.0, ! injection flat time (in 1/wci)
+inj_t_downramp(1:4)  = 200.0,   200.0,  200.0,  200.0, ! injection downramp time (in 1/wci)
+
+
+! ------------------ plasma setup ----------------!
+nspec          = 1,  ! number of ion species, maximum 5
+qspec(1:5)     = 1., ! charge of each ion species 
+wspec(1:5)     = 1., ! mass of each ion species
+frac(1:5)      = 1., ! density normalized to n0 (associated with wpi)
+beta_spec(1:5) = 2.3e-4, ! beta of each ion species 
+beta_elec      = 1.3e-3, ! beta of electrons
+
+ppcx(1:5) = 1, ! number of particles per cell along x 
+ppcy(1:5) = 1, ! number of particles per cell along y 
+ppcz(1:5) = 10000, ! number of particles per cell along z 
+
+wpiwci = 300., ! ratio of ion plasma frequency to ion cyclotron frequency 
+denmin = 0.05,  ! force density lower than this to this value
+n_sort = 10, ! frequency at which to sort particles
+
+! resistivity 
+ieta   = 0,      ! available models ieta=1,2,3,4,5,6
+resis  = 2.0e-4,  ! for ieta=0: constant resisitivity 
+netax  = 10,     ! for ieta=1   
+netay  = 2, 
+etamin = 1.0e-6, ! for ieta>0
+etamax = 5.0e-5,
+eta_zs = 200,    ! for ieta=6: z scale length (in cell) of the resistive layers
+
+! anisotropy in velocity
+anisot(1:5) = 1.0, ! anisotropy of velocity for each species
+gamma       = 1.66667, ! gamma factor in EoS
+
+! density/velocity smoothing
+smoothing   = .true., 
+smooth_pass = 1, 
+
+! ------------------ diagnostic control ----------------!
+n_print = 100,  ! frequency at which to print simulation progression
+
+! dump mesh quantities
+n_diag_mesh = 1000, ! frequency at which to write mesh data 
+mesh_mpio = .true., ! use MPI IO (one file only) instead of traditional binary output
+n_diag_nbxby_highfreq = 50, 
+
+! integrated energy
+n_diag_energy = 100, ! frequency at which to write integrated energy data
+
+! probe fields at given locations
+n_diag_probe = 0, ! frequency at which to write field probe data
+probe_x = 2, ! x location (in cell) of the probes
+probe_mpi = .true. ! dump probe file by mpi ranks
+
+! particle tracking
+n_diag_tracking = 0, ! frequency at which to write tracking particle data
+tracking_binary = .true., ! write tracking data in binary (unformatted) or formatted form
+tracking_mpi = .true., ! write tracking data by mpi rank
+
+! dump raw particles
+n_diag_particle = 0, ! frequency at which to write particles within a volume
+xbox_l = 0., xbox_r = 4.0, ! volume within which particles will be dumped
+ybox_l = 0., ybox_r = 4.0, 
+zbox_l = 0., zbox_r = 100.0,
+
+! write restart
+n_write_restart = 0, ! frequency at which to write restart files
+
+/
