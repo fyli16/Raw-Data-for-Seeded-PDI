@@ -1,5 +1,5 @@
 # Raw-Data-for-Seeded-PDI
-Raw data for the manuscript "A novel scheme for measuring the growth of Alfven wave parametric decay instability using counter-propagating waves"
+Raw data for the manuscript "A novel scheme for measuring the growth of Alfven wave parametric decay instability using counter-propagating waves" [arXiv](https://arxiv.org/abs/2507.13590)
 
 The source code is hosted and can be freely accessible here: [github repo](https://github.com/fyli16/Hybrid-Kinetic-Fluid-3D-Plasma-Code/tree/RMF-antenna)
 
